@@ -13,7 +13,7 @@ def anglifyASM(left, right):
     height = left.shape[0]
     width = left.shape[1]
     returnedImage = np.zeros([height, width, 3], dtype='uint8')
-    asmDll = ct.WinDLL("C:\\Users\\blaze\\PycharmProjects\\ctypes\\DllAsm.dll")
+    asmDll = ct.WinDLL("C:\\JA-Anglyph-AsmPython\\DllAsm.dll")
 
     for i in range(0, width * height, 4):
         # Get 4 pixels from left image

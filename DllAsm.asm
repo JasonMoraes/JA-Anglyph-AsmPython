@@ -16,14 +16,12 @@ Calculate proc
 	movups XMM0, [rbx]
 	movups XMM1, MULTIPLIERB
 	pmaddwd XMM0, XMM1
-	CVTTPS2DQ XMM0, XMM0
 
 	;Get and multiply the green value by 0.587 and add it to XMM0
 	mov rbx, [rcx+8]
 	movups XMM2, [rbx]
 	movups XMM1, MULTIPLIERG
 	pmaddwd XMM2, XMM1
-	CVTTPS2DQ XMM2, XMM2
 	addps XMM0, XMM2
 
 	;Get and multiply the red value by 0.299 and add it to XMM0
@@ -31,13 +29,12 @@ Calculate proc
 	movups XMM2, [rbx]
 	movups XMM1, MULTIPLIERR
 	pmaddwd XMM2, XMM1
-	CVTTPS2DQ XMM2, XMM2
 	addps XMM0, XMM2
 
 	;Return the XMM0 values to Blue array
 
 
-	mov rbx, [rcx]
+	mov rbx, rcx
 	movups [rbx], XMM0
 
 	pop rbx
