@@ -13,7 +13,7 @@ def anglifyASM(left, right):
     height = left.shape[0]
     width = left.shape[1]
     returnedImage = np.zeros([height, width, 3], dtype='uint8')
-    asmDll = ct.WinDLL("C:\\JA-Anglyph-AsmPython\\DllAsm.dll")
+    asmDll = ct.WinDLL("C:\\Users\\jakub\\OneDrive\\Pulpit\\ASM PROJEKT\\JA-Anglyph-AsmPython\\DllAsm.dll")
 
     for i in range(0, width * height, 4):
         # Get 4 pixels from left image
@@ -21,68 +21,82 @@ def anglifyASM(left, right):
         pixL2 = getPixelOfFlattenedArray(left, i + 1)
         pixL3 = getPixelOfFlattenedArray(left, i + 2)
         pixL4 = getPixelOfFlattenedArray(left, i + 3)
-
+        pixL = (ct.c_int * len(pixL))(*pixL)
+        pixL2 = (ct.c_int * len(pixL2))(*pixL2)
+        pixL3 = (ct.c_int * len(pixL3))(*pixL3)
+        pixL4 = (ct.c_int * len(pixL4))(*pixL4)
         # Get 4 pixels from right image
         pixR = getPixelOfFlattenedArray(right, i)
         pixR2 = getPixelOfFlattenedArray(right, i + 1)
         pixR3 = getPixelOfFlattenedArray(right, i + 2)
         pixR4 = getPixelOfFlattenedArray(right, i + 3)
+        pixR = (ct.c_int * len(pixL))(*pixR)
+        pixR2 = (ct.c_int * len(pixL2))(*pixR2)
+        pixR3 = (ct.c_int * len(pixL3))(*pixR3)
+        pixR4 = (ct.c_int * len(pixL4))(*pixR4)
+        passedList = [pixL, pixL2, pixL3, pixL4, pixR, pixR2, pixR3, pixR4]
+        # # Create 3 arrays off left BGR values
+        # pyLarrB = [pixL[0], pixL2[0], pixL3[0], pixL4[0]]
+        # pyLarrG = [pixL[1], pixL2[1], pixL3[1], pixL4[1]]
+        # pyLarrR = [pixL[2], pixL2[2], pixL3[2], pixL4[2]]
+        #
+        # # Create 3 arrays off right BGR values
+        # pyRarrB = [pixR[0], pixR2[0], pixR3[0], pixR4[0]]
+        # pyRarrG = [pixR[1], pixR2[1], pixR3[1], pixR4[1]]
+        # pyRarrR = [pixR[2], pixR2[2], pixR3[2], pixR4[2]]
+        #
+        # #?
+        # arrLB = (ct.c_int * len(pyLarrB))(*pyLarrB)
+        # arrLG = (ct.c_int * len(pyLarrG))(*pyLarrG)
+        # arrLR = (ct.c_int * len(pyLarrR))(*pyLarrR)
+        #
+        # arrRB = (ct.c_int * len(pyRarrB))(*pyRarrB)
+        # arrRG = (ct.c_int * len(pyRarrG))(*pyRarrG)
+        # arrRR = (ct.c_int * len(pyRarrR))(*pyRarrR)
 
-        # Create 3 arrays off left BGR values
-        pyLarrB = [pixL[0], pixL2[0], pixL3[0], pixL4[0]]
-        pyLarrG = [pixL[1], pixL2[1], pixL3[1], pixL4[1]]
-        pyLarrR = [pixL[2], pixL2[2], pixL3[2], pixL4[2]]
+        # #Creating struct of arrays
+        # arrLeftStruct = tabASM(arrLB, arrLG, arrLR)
+        # arrRightStruct = tabASM(arrRB, arrRG, arrRR)
+        #
+        # #Passing struct to arrays
+        # asmDll.Calculate(arrLeftStruct)
+        # asmDll.Calculate(arrRightStruct)
+        #passedCArray = (ct.POINTER(ct.c_int) * len(passedList))(*passedList)
+        passedCArray = (ct.c_uint * 3 * 8)(*(tuple(i) for i in passedList))
+        #print(passedCArray)
+        #print(passedCArray[2][:])
 
-        # Create 3 arrays off right BGR values
-        pyRarrB = [pixR[0], pixR2[0], pixR3[0], pixR4[0]]
-        pyRarrG = [pixR[1], pixR2[1], pixR3[1], pixR4[1]]
-        pyRarrR = [pixR[2], pixR2[2], pixR3[2], pixR4[2]]
+        asmDll.Calculate(passedCArray)
+        #print(passedCArray[2][:])
 
-        #?
-        arrLB = (ct.c_int * len(pyLarrB))(*pyLarrB)
-        arrLG = (ct.c_int * len(pyLarrG))(*pyLarrG)
-        arrLR = (ct.c_int * len(pyLarrR))(*pyLarrR)
-
-        arrRB = (ct.c_int * len(pyRarrB))(*pyRarrB)
-        arrRG = (ct.c_int * len(pyRarrG))(*pyRarrG)
-        arrRR = (ct.c_int * len(pyRarrR))(*pyRarrR)
-
-        #Creating struct of arrays
-        arrLeftStruct = tabASM(arrLB, arrLG, arrLR)
-        arrRightStruct = tabASM(arrRB, arrRG, arrRR)
-
-        #Passing struct to arrays
-        asmDll.Calculate(arrLeftStruct)
-        asmDll.Calculate(arrRightStruct)
-
-        #TODO: fix the bug with conversion and fix the every 4-th pixel wrong value (?)
-        parsedRArray = ct.cast(arrLB, ct.POINTER(ct.c_int * 4))
-        parsedGBArray = ct.cast(arrRB, ct.POINTER(ct.c_int * 4))
-        pythonBGList = parsedGBArray.contents[:]
-        pythonRList = parsedRArray.contents[:]
-
+        #print([passedCArray[0][0], passedCArray[0][1], passedCArray[0][2]])
+        # #TODO: fix the bug with conversion and fix the every 4-th pixel wrong value (?)
+        # parsedRArray = ct.cast(arrLB, ct.POINTER(ct.c_int * 4))
+        # parsedGBArray = ct.cast(arrRB, ct.POINTER(ct.c_int * 4))
+        # pythonBGList = parsedGBArray.contents[:]
+        # pythonRList = parsedRArray.contents[:]
+        #
         rpix = getPixelOfFlattenedArray(returnedImage, i)
         rpix2 = getPixelOfFlattenedArray(returnedImage, i + 1)
         rpix3 = getPixelOfFlattenedArray(returnedImage, i + 2)
         rpix4 = getPixelOfFlattenedArray(returnedImage, i + 3)
 
-
-        rpix[0] = int(pythonBGList[0])
-        rpix[1] = int(pythonBGList[0])
-        rpix[2] = int(pythonRList[0])
-
-        rpix2[0] = int(pythonBGList[1])
-        rpix2[1] = int(pythonBGList[1])
-        rpix2[2] = int(pythonRList[1])
-
-        rpix3[0] = int(pythonBGList[2])
-        rpix3[1] = int(pythonBGList[2])
-        rpix3[2] = int(pythonRList[2])
+        rpix[0] = int(passedCArray[0][0])
+        rpix[1] = int(passedCArray[0][1])
+        rpix[2] = int(passedCArray[0][2])
+        #print (rpix[2])
         #
-        rpix4[0] = int(pythonBGList[3])
-        rpix4[1] = int(pythonBGList[3])
-        rpix4[2] = int(pythonRList[3])
+        rpix2[0] = int(passedCArray[1][0])
+        rpix2[1] = int(passedCArray[1][1])
+        rpix2[2] = int(passedCArray[1][2])
 
+        rpix3[0] = int(passedCArray[2][0])
+        rpix3[1] = int(passedCArray[2][1])
+        rpix3[2] = int(passedCArray[2][2])
+        #
+        rpix4[0] = int(passedCArray[3][0])
+        rpix4[1] = int(passedCArray[3][1])
+        rpix4[2] = int(passedCArray[3][2])
     return returnedImage
 
 
