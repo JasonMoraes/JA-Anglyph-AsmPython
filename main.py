@@ -6,7 +6,7 @@ import ctypes as ct
 
 
 class tabASM(ct.Structure):
-    _fields_ = [("B", ct.POINTER(ct.c_int)), ("G", ct.POINTER(ct.c_int)), ("R", ct.POINTER(ct.c_int))]
+    fields = [("B", ct.POINTER(ct.c_int)), ("G", ct.POINTER(ct.c_int)), ("R", ct.POINTER(ct.c_int))]
 
 
 def anglifyASM(left, right):
@@ -127,7 +127,7 @@ def moveTenToLeft(img):
 def cutImage(img):
     height = img.shape[0]
     width = img.shape[1] - 10
-    returnedImage = np.zeros([height, width, 3], dtype=ct.c_int)
+    returnedImage = np.zeros([height, width, 3],dtype=np.uint8)
     for i in range(0, height):
         for j in range(0, width):
             returnedImage[i][j][2] = img[i][j + 5][2]
@@ -139,16 +139,18 @@ def cutImage(img):
 def getPixelOfFlattenedArray(img, idx):
     height = img.shape[0]
     width = img.shape[1]
+    if idx >= height*width:
+        return [0, 0, 0]
     row = int(idx / width)
     col = idx % width
     return img[row][col]
 
 
-img = cv.imread('sample.jpg')
+img = cv.imread('sample2.jpg')
 left = moveTenToLeft(img)
 right = moveTenToRight(img)
 anaglified = anglifyASM(left, right)
-
-cv.imshow('anglif', anaglified)
+anaglified = cutImage(anaglified)
+cv.imshow('anaglif', anaglified)
 cv.imwrite('result.jpg', anaglified)
 cv.waitKey(0)
