@@ -8,12 +8,6 @@ import time
 import asyncio
 
 
-def background(f):
-    def wrapped(*args, **kwargs):
-        return asyncio.get_event_loop().run_in_executor(None, f, *args, **kwargs)
-
-    return wrapped
-
 class tabASM(ct.Structure):
     fields = [("B", ct.POINTER(ct.c_int)), ("G", ct.POINTER(ct.c_int)), ("R", ct.POINTER(ct.c_int))]
 
@@ -23,11 +17,12 @@ class Core:
     left = []
     right = []
     returnedImage = []
+    systemThreads = 1
 
     asmDll = ct.WinDLL("C:\\Users\\jakub\\OneDrive\\Pulpit\\ASM PROJEKT\\JA-Anglyph-AsmPython\\DllAsm.dll")
 
-    @background
-    def calculatePieceOfImage(self, i):
+    async def calculatePieceOfImage(self, i):
+
         # Get 4 pixels from left image
         pixL = self.getPixelOfFlattenedArray(self.left, i)
         pixL2 = self.getPixelOfFlattenedArray(self.left, i + 1)
@@ -73,15 +68,19 @@ class Core:
         rpix4[1] = int(passedCArray[3][1])
         rpix4[2] = int(passedCArray[3][2])
 
-    def anglifyASM(self):
+    async def anglifyASM(self):
+        semaphore = asyncio.Semaphore(self.systemThreads)
+
         height = self.left.shape[0]
         width = self.left.shape[1]
         self.returnedImage = np.zeros([height, width, 3], dtype='uint8')
 
         time_start = time.time()
-        for i in range(0, width * height, 4):
-            #print(i)
-            self.calculatePieceOfImage(i)
+        tasks = [self.calculatePieceOfImage(i)for i in range(0, width * height, 4)]
+
+        async with semaphore:
+            await asyncio.gather(*tasks, return_exceptions=True)
+
         self.elapsedTime = time.time() - time_start
         return self.returnedImage
 
@@ -134,7 +133,7 @@ class Core:
     def anaglify(self, image):
         self.left = self.moveTenToLeft(image)
         self.right = self.moveTenToRight(image)
-        anaglified = self.anglifyASM()
+        anaglified = asyncio.run(self.anglifyASM())
         #anaglified = self.cutImage(anaglified) TODO do working cut on image
         return anaglified
 
