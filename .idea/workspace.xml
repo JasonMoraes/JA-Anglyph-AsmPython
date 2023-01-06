@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0032ee8e-3b18-4135-8c48-dd3bce3fd6a2" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/ViewRenderer.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DllAsm.asm" beforeDir="false" afterPath="$PROJECT_DIR$/DllAsm.asm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DllAsm.dll" beforeDir="false" afterPath="$PROJECT_DIR$/DllAsm.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/result.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/result.jpg" afterDir="false" />
     </list>
