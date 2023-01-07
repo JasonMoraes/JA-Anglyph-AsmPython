@@ -1,0 +1,6 @@
+﻿  AnaglyphLib.cpp
+C:\Users\blaze\source\repos\DllCPP\AnaglyphLib.cpp(8,6): warning C4273: "Calculate": niespójne powiązanie biblioteki dll
+C:\Users\blaze\source\repos\DllCPP\AnaglyphLib.h(10,33): message : zobacz poprzednią definicję „Calculate”
+C:\Users\blaze\source\repos\DllCPP\AnaglyphLib.cpp(12,82): warning C4244: "=": konwersja z "double" do "int", możliwa utrata danych
+C:\Users\blaze\source\repos\DllCPP\AnaglyphLib.cpp(13,86): warning C4244: "=": konwersja z "double" do "int", możliwa utrata danych
+  DllCPP.vcxproj -> C:\Users\blaze\source\repos\DllCPP\x64\Debug\DllCPP.dll

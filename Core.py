@@ -3,13 +3,10 @@ import math
 import numpy as np
 import cv2 as cv
 import ctypes as ct
+from pathlib import Path
 
 import time
 import asyncio
-
-
-class tabASM(ct.Structure):
-    fields = [("B", ct.POINTER(ct.c_int)), ("G", ct.POINTER(ct.c_int)), ("R", ct.POINTER(ct.c_int))]
 
 
 class Core:
@@ -17,10 +14,8 @@ class Core:
     left = []
     right = []
     returnedImage = []
-    systemThreads = 1
-
-    asmDll = ct.WinDLL("C:\\Users\\jakub\\OneDrive\\Pulpit\\ASM PROJEKT\\JA-Anglyph-AsmPython\\DllAsm.dll")
-
+    chosenASM = False
+    asmDll= ct.cdll.LoadLibrary('{}\DllCPP.dll'.format(Path().absolute()))
     async def calculatePieceOfImage(self, i):
 
         # Get 4 pixels from left image
@@ -44,7 +39,6 @@ class Core:
         passedList = [pixL, pixL2, pixL3, pixL4, pixR, pixR2, pixR3, pixR4]
 
         passedCArray = (ct.c_uint * 3 * 8)(*(tuple(i) for i in passedList))
-
         self.asmDll.Calculate(passedCArray)
 
         rpix = self.getPixelOfFlattenedArray(self.returnedImage, i)
@@ -131,10 +125,12 @@ class Core:
         return img[row][col]
 
     def anaglify(self, image):
+        if self.chosenASM == True:
+            self.asmDll = ct.WinDLL('{}\DllASM.dll'.format(Path().absolute()))
         self.left = self.moveTenToLeft(image)
         self.right = self.moveTenToRight(image)
         anaglified = asyncio.run(self.anglifyASM())
-        #anaglified = self.cutImage(anaglified) TODO do working cut on image
+        anaglified = self.cutImage(anaglified)
         return anaglified
 
 
